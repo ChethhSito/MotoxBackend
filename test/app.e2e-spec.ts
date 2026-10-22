@@ -23,6 +23,26 @@ describe('AppController (e2e)', () => {
       .expect({ status: 'ok', database: 'postgresql', majorVersion: 18 });
   });
 
+  it('/health/live (GET)', () => {
+    return request(app.getHttpServer())
+      .get('/health/live')
+      .expect(200)
+      .expect({ status: 'ok', service: 'motox-api' });
+  });
+
+  it('/health/ready (GET)', () => {
+    return request(app.getHttpServer())
+      .get('/health/ready')
+      .expect(200)
+      .expect({
+        status: 'ok',
+        checks: {
+          database: { status: 'up', engine: 'postgresql', majorVersion: 18 },
+        },
+        schemaVersion: '003_user_role_events.sql',
+      });
+  });
+
   afterEach(async () => {
     await app.close();
   });
